@@ -15,3 +15,16 @@ def database_connection():
     except psycopg2.Error as err:
         st.error(f"Error connecting to database: {err}")
         return None
+
+
+
+st.title("Retail Sales Analysis")
+st.title("SQL Querry App")
+st.sidebar.title("Menu")
+option=st.sidebar.radio("Choose an option",["Provided Queries", "Own Queries", "Create AI-Powered Custom Query"])
+
+if option == "Provided Queries":
+    display_results("Provided Queries", Provided_Queries)
+
+elif option == "Own Queries":
+    display_results("Own Queries", Own_Queries)
