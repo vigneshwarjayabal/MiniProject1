@@ -49,4 +49,5 @@ urllib3==2.2.3
 vanna==0.0.33
 watchdog==4.0.2
 zipp==3.20.2
+psycopg2
 
