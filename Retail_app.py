@@ -1,4 +1,3 @@
-import psycopg2
 import pandas as pd
 import streamlit as st
 from queries import business_insights, provided_query, my_query 
