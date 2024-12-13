@@ -15,3 +15,11 @@ def create_connection():
 
     )
     return conn
+
+def fetch_data(query):
+    conn = create_connection()
+    df = pd.read_sql(query, conn)
+    conn.close()
+    return df
+
+st.title('Retail Order Data Analysis')
