@@ -1,9 +1,6 @@
 import pandas as pd
+import psycopg2
 import streamlit as st
-
-
-
-
 def database_connection():
     try:
         connection = psycopg2.connect(
