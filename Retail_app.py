@@ -27,7 +27,7 @@ def fetch_query_results(query):
 # Display results in Streamlit
 def display_results(query_name, query):
     st.subheader(f"Results for {query_name}")
-    data = execute_query(query)
+    data = fetch_query_results(query)
     if data is not None:
         st.write(data)
     else:
