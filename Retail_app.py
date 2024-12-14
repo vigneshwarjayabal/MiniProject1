@@ -38,7 +38,7 @@ my_query = {
 
 def database_connection():
     try:
-        # Build the connection string using secrets
+        
         connection_string = (
             f"postgresql+psycopg2://{st.secrets['postgresql']['user']}:"  # Updated for PostgreSQL
             f"{st.secrets['postgresql']['password']}@"
@@ -51,10 +51,7 @@ def database_connection():
         st.error(f"Error connecting to the database: {err}")
         return None
 
-# FUNCTION FOR EXECUTING QUERY
-# IT RECEIVES QUERY SELECTED BY THE USER AS THE INPUT
-# CREATES DATABASE CONNECTION USING database_connection() FUNCTION
-# AND RETURNS THE OUTPUT AS PANDAS DATAFRAME
+
 def execute_query(query):
     try:
         engine = database_connection()
@@ -69,8 +66,7 @@ def execute_query(query):
         st.error(f"Error executing the query: {e}")
         return pd.DataFrame()
 
-# FUNCTION FOR DISPLAYING RESULTS AS DATAFRAME
-# IT GETS TWO ARGUMENTS: 1. USER'S SELECTION 2. RESPECTIVE QUERY FROM THE DICTIONARY
+
 def display_results(selection, query):
     st.subheader(selection)
     selected_query = st.selectbox("Choose a query", list(query.keys()))
