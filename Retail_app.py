@@ -1,6 +1,7 @@
 import pandas as pd
 import psycopg2
 import streamlit as st
+from queries import business_insights, provided_query, my_query
 def database_connection():
     try:
         connection = psycopg2.connect(
