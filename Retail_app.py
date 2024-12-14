@@ -40,10 +40,10 @@ def database_connection():
     try:
         # Build the connection string using secrets
         connection_string = (
-            f"postgresql+psycopg2://{st.secrets['postgres']['user']}:"  # Updated for PostgreSQL
-            f"{st.secrets['postgres']['password']}@"
-            f"{st.secrets['postgres']['host']}/"
-            f"{st.secrets['postgres']['database']}"
+            f"postgresql+psycopg2://{st.secrets['postgresql']['user']}:"  # Updated for PostgreSQL
+            f"{st.secrets['postgresql']['password']}@"
+            f"{st.secrets['postgresql']['host']}/"
+            f"{st.secrets['postgresql']['database']}"
         )
         engine = create_engine(connection_string)
         return engine
