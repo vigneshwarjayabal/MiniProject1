@@ -1,6 +1,8 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 business_insigths = {
   "Top-Selling Products":"SELECT p.product_id, p.category,p.sub_category,SUM(o.sale_price * o.quantity) AS total_revenue FROM orders o JOIN products p ON o.product_id = p.product_id GROUP BY p.product_id, p.category,p.sub_category ORDER BY total_revenue DESC LIMIT 10;",
@@ -76,13 +78,51 @@ def display_results(selection, query):
     selected_query = st.selectbox("Choose a query", list(query.keys()))
     st.write("**Query:**")
     st.code(f"{query[selected_query]}")
+    
     if st.button("Run", key=f"run_button_{selected_query}"):
         result = execute_query(query[selected_query])
+        
         if not result.empty:
             st.write("**Result:**")
-            return st.dataframe(result)
+            st.dataframe(result)
+
+            # Visualization Section
+            st.write("**Visualization:**")
+            
+            # Identify data for visualization
+            numeric_columns = result.select_dtypes(include=['float64', 'int64']).columns.tolist()
+            categorical_columns = result.select_dtypes(include=['object']).columns.tolist()
+
+            # 1. Time-Series Data Visualization
+            if 'month' in result.columns or 'year' in result.columns:
+                time_col = 'month' if 'month' in result.columns else 'year'
+                if len(numeric_columns) > 0:
+                    st.line_chart(result.set_index(time_col)[numeric_columns[0]])
+                else:
+                    st.warning("No numeric data available for time-series visualization.")
+            
+            # 2. Bar Chart for Categorical vs Numeric
+            elif len(categorical_columns) > 0 and len(numeric_columns) > 0:
+                fig, ax = plt.subplots(figsize=(8, 4))
+                sns.barplot(data=result, x=categorical_columns[0], y=numeric_columns[0], ax=ax)
+                ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+                st.pyplot(fig)
+            
+            # 3. Pie Chart for Proportions
+            elif len(categorical_columns) > 0 and len(numeric_columns) == 1:
+                fig, ax = plt.subplots(figsize=(6, 6))
+                result.set_index(categorical_columns[0]).plot.pie(y=numeric_columns[0], ax=ax, autopct="%.2f%%")
+                st.pyplot(fig)
+
+            # 4. Fallback Visualization: Generic Bar Chart for Numeric Data
+            elif len(numeric_columns) > 0:
+                st.bar_chart(result[numeric_columns[0]])
+
+            else:
+                st.warning("No suitable data for visualization.")
         else:
             st.warning("No data returned for the query.")
+
 
 
 st.title("Retail Order Data Analysis")
