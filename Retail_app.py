@@ -1,42 +1,28 @@
 import pandas as pd
-import pg8000  # Alternative PostgreSQL library
+from sqlalchemy import create_engine
 import streamlit as st
 from queries import business_insights, provided_query, my_query
 
-# Database connection
 def database_connection():
     try:
-        # Establish connection using pg8000
-        connection = pg8000.connect(
-            host=st.secrets["postgresql"]["host"],  
-            user=st.secrets["postgresql"]["user"],  
-            password=st.secrets["postgresql"]["password"], 
-            database=st.secrets["postgresql"]["database"],
-            port=int(st.secrets["postgresql"]["port"])  # Ensure port is an integer
+        engine = create_engine(
+            f"postgresql+psycopg2://{st.secrets['postgresql']['user']}:{st.secrets['postgresql']['password']}@{st.secrets['postgresql']['host']}:{st.secrets['postgresql']['port']}/{st.secrets['postgresql']['database']}"
         )
-        return connection
+        return engine
     except Exception as e:
-        st.error(f"Database connection failed: {e}")
+        st.error(f"Error connecting to the database: {e}")
         return None
 
-# Execute a query and return results
-def execute_query(query):
-    connection = database_connection()
-    if connection:
+def fetch_query_results(query):
+    engine = database_connection()
+    if engine:
         try:
-            cursor = connection.cursor()
-            cursor.execute(query)
-            result = cursor.fetchall()
-            columns = [desc[0] for desc in cursor.description]
-            cursor.close()
-            connection.close()
-            return pd.DataFrame(result, columns=columns)
+            df = pd.read_sql(query, con=engine)
+            return df
         except Exception as e:
             st.error(f"Error executing query: {e}")
             return None
-    else:
-        st.error("No database connection.")
-        return None
+    return None
 
 # Display results in Streamlit
 def display_results(query_name, query):
