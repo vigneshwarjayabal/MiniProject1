@@ -40,10 +40,10 @@ def database_connection():
     try:
         # Build the connection string using secrets
         connection_string = (
-            f"mysql+pymysql://{st.secrets['mysql']['user']}:"
-            f"{st.secrets['mysql']['password']}@"
-            f"{st.secrets['mysql']['host']}/"
-            f"{st.secrets['mysql']['database']}"
+            f"postgresql+psycopg2://{st.secrets['postgres']['user']}:"  # Updated for PostgreSQL
+            f"{st.secrets['postgres']['password']}@"
+            f"{st.secrets['postgres']['host']}/"
+            f"{st.secrets['postgres']['database']}"
         )
         engine = create_engine(connection_string)
         return engine
@@ -52,7 +52,9 @@ def database_connection():
         return None
 
 # FUNCTION FOR EXECUTING QUERY
-# Receives query and fetches the result as a DataFrame
+# IT RECEIVES QUERY SELECTED BY THE USER AS THE INPUT
+# CREATES DATABASE CONNECTION USING database_connection() FUNCTION
+# AND RETURNS THE OUTPUT AS PANDAS DATAFRAME
 def execute_query(query):
     try:
         engine = database_connection()
@@ -68,19 +70,20 @@ def execute_query(query):
         return pd.DataFrame()
 
 # FUNCTION FOR DISPLAYING RESULTS AS DATAFRAME
-# Gets dictionary name and query dictionary as inputs
-def display_results(dictionary_name, query_dict):
-    st.subheader(dictionary_name)
-    selected_query = st.selectbox("Choose a query", list(query_dict.keys()))
+# IT GETS TWO ARGUMENTS: 1. USER'S SELECTION 2. RESPECTIVE QUERY FROM THE DICTIONARY
+def display_results(selection, query):
+    st.subheader(selection)
+    selected_query = st.selectbox("Choose a query", list(query.keys()))
     st.write("**Query:**")
-    st.code(f"{query_dict[selected_query]}")
-    if st.button("Run", key=f"run_button_{dictionary_name}_{selected_query}"):
-        result = execute_query(query_dict[selected_query])
+    st.code(f"{query[selected_query]}")
+    if st.button("Run", key=f"run_button_{selected_query}"):
+        result = execute_query(query[selected_query])
         if not result.empty:
             st.write("**Result:**")
-            st.dataframe(result)
+            return st.dataframe(result)
         else:
             st.warning("No data returned for the query.")
+
 
 st.title("Retail Order Data Analysis")
 st.sidebar.title("Navigation")
